@@ -8,15 +8,15 @@ SECTIONS
         ${init_object}
     }
 
-    . = ALIGN(SZ_16K);
+    . = ALIGN(SZ_16K);              //将当前指针对齐至16k
 
-    init_end = ABSOLUTE(.);
+    init_end = ABSOLUTE(.);     // 记录下对齐后的当前指针的值，便于后面使用
 
     .text KERNEL_VADDR + init_end : AT(init_end) {
         *(.text*)
     }
 
-    . = ALIGN(SZ_64K);
+    . = ALIGN(SZ_64K);      
     .data : {
         *(.data*)
     }

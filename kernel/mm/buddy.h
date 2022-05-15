@@ -34,8 +34,9 @@ struct phys_mem_pool {
 	 * The start virtual address (for used in kernel) of
 	 * this physical memory pool.
 	 */
-	u64 pool_start_addr;
-	u64 pool_mem_size;
+
+	u64 pool_start_addr;  
+	u64 pool_mem_size;  
 
 	/*
 	 * This field is only used in ChCore unit test.
@@ -47,6 +48,7 @@ struct phys_mem_pool {
 	 * The start virtual address (for used in kernel) of
 	 * the metadata area of this pool.
 	 */
+	// 初始的页
 	struct page *page_metadata;
 
 	/* The free list of different free-memory-chunk orders. */
@@ -62,6 +64,9 @@ void init_buddy(struct phys_mem_pool *zone, struct page *start_page,
 struct page *buddy_get_pages(struct phys_mem_pool *, u64 order);
 void buddy_free_pages(struct phys_mem_pool *, struct page *page);
 
+// 物理页到虚拟地址
 void *page_to_virt(struct phys_mem_pool *, struct page *page);
+// 虚拟地址到物理页
 struct page *virt_to_page(struct phys_mem_pool *, void *ptr);
+
 u64 get_free_mem_size_from_buddy(struct phys_mem_pool *);

@@ -11,7 +11,7 @@
  */
 
 #pragma once
-
+// 内存对齐的方式
 #define ALIGN(n) __attribute__((__aligned__(n)))
 
 #define ROUND_UP(x, n)		(((x) + (n) - 1) & ~((n) - 1))

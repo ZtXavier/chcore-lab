@@ -67,29 +67,37 @@ void kernel_space_check(void)
 
 struct phys_mem_pool global_mem;
 
+
+// 以下代码主要是内存的初始化，是内存模型
 void mm_init(void)
 {
+
 	vaddr_t free_mem_start = 0;
 	struct page *page_meta_start = NULL;
 	u64 npages = 0;
 	u64 start_vaddr = 0;
-
+	
+    // 将free_mem_start 指定为img_end
 	free_mem_start =
 	    phys_to_virt(ROUND_UP((vaddr_t) (&img_end), PAGE_SIZE));
 	npages = NPAGES;
 	start_vaddr = START_VADDR;
 	kdebug("[CHCORE] mm: free_mem_start is 0x%lx, free_mem_end is 0x%lx\n",
 	       free_mem_start, phys_to_virt(PHYSICAL_MEM_END));
-
+	 
+	//预留最大页数作为内存空间
 	if ((free_mem_start + npages * sizeof(struct page)) > start_vaddr) {
 		BUG("kernel panic: init_mm metadata is too large!\n");
 	}
 
+	// 物理内存页从page_meta_start开始分配
 	page_meta_start = (struct page *)free_mem_start;
 	kdebug("page_meta_start: 0x%lx, real_start_vadd: 0x%lx,"
 	       "npages: 0x%lx, meta_page_size: 0x%lx\n",
 	       page_meta_start, start_vaddr, npages, sizeof(struct page));
 
+
+	// 初始化内存分配器
 	/* buddy alloctor for managing physical memory */
 	init_buddy(&global_mem, page_meta_start, start_vaddr, npages);
 
