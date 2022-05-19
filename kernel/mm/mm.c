@@ -32,7 +32,7 @@ extern unsigned long *img_end;
  * | metadata (npages * sizeof(struct page)) | start_vaddr ... (npages * PAGE_SIZE) |
  *
  */
-
+// 提供va的初始地址
 unsigned long get_ttbr1(void)
 {
 	unsigned long pgd;
@@ -51,7 +51,8 @@ unsigned long get_ttbr1(void)
 void map_kernel_space(vaddr_t va, paddr_t pa, size_t len)
 {
 	// <lab2>
-
+	vaddr_t *ttbr = (vaddr_t*)get_ttbr1();
+	map_range_in_pgtb(ttbr,va,pa,len,KERNEL_PT);
 	// </lab2>
 }
 

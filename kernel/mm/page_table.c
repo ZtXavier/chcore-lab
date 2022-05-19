@@ -144,6 +144,9 @@ static int get_next_ptp(ptp_t * cur_ptp, u32 level, vaddr_t va,
 		return BLOCK_PTP;
 }
 
+
+
+/* 页地址翻译 */
 /*
  * Translate a va to pa, and get its pte for the flags
  */
@@ -162,10 +165,47 @@ static int get_next_ptp(ptp_t * cur_ptp, u32 level, vaddr_t va,
 int query_in_pgtbl(vaddr_t * pgtbl, vaddr_t va, paddr_t * pa, pte_t ** entry)
 {
 	// <lab2>
+	ptp_t * cur_ptp = (ptp_t*)pgtbl;
+	ptp_t *next_ptp = NULL;
+	pte_t *next_pte = NULL;
+	int lev = 0;
+	int err = 0;
 
+	while(lev <= 3 && (err = get_next_ptp(cur_ptp,lev,va,&next_ptp,&next_pte,false)) == NORMAL_PTP)
+	{
+		cur_ptp = next_ptp;
+		++lev;
+	}
+	if(err == NORMAL_PTP)
+	{
+		if(lev != 4)
+		{
+			kwarn("this is %d level is not 4",lev);
+			return -ENOMAPPING;
+		}
+
+		if(!next_pte->l3_page.is_valid || !next_pte->l3_page.is_table)
+		{
+			return -ENOMAPPING;
+		}
+		*pa = virt_to_phys((vaddr_t)next_ptp) + GET_VA_OFFSET_L3(va);
+		return 0;
+	}
+	else if (err < 0)
+	{
+		return err;
+	}
+	else
+	{
+		return err;
+	}
 	// </lab2>
 	return 0;
 }
+
+
+/* 将虚拟地址 [va:va+size] 映射到
+ * 给定pgtbl中的物理地址[pa:pa+size] */
 
 /*
  * map_range_in_pgtbl: map the virtual address [va:va+size] to 
@@ -182,12 +222,38 @@ int query_in_pgtbl(vaddr_t * pgtbl, vaddr_t va, paddr_t * pa, pte_t ** entry)
  * and it is convenient for you to call set_pte_flags to set the page
  * permission bit. Don't forget to call flush_tlb at the end of this function 
  */
+/* 在这个函数中，你应该首先调用 get_next_ptp()
+ * 获取每个级别的页表条目。仔细阅读类型 pte_t
+ * 方便你调用 set_pte_flags 设置页面
+ * 权限位。不要忘记在这个函数结束时调用flush_tlb */
+
 int map_range_in_pgtbl(vaddr_t * pgtbl, vaddr_t va, paddr_t pa,
 		       size_t len, vmr_prop_t flags)
 {
 	// <lab2>
+	for(vaddr_t end_va = va + len;va < end_va; va += PAGE_SIZE,pa+= PAGE_SIZE)
+	{
+		ptp_t *cur_ptp = (ptp_t*)pgtbl;
+		ptp_t *next_ptp = NULL;
+		pte_t *next_pte = NULL;
+		int level = 0;
+		int err = 0;
+		while(level <= 2 && (err = get_next_ptp(cur_ptp,level,va,&next_ptp,&next_pte,true)) ==NORMAL_PTP)
+		{
+			cur_ptp = next_ptp;
+			++level;
+		}
+		// 这里需要我们手动设置
+		u32 index = GET_L3_INDEX(va);
+		next_pte = &(cur_ptp->ent[index]);
+		next_pte->l3_page.is_valid = 1;
+		next_pte->l3_page.is_page = 1;
+		next_pte->l3_page.pfn = pa >> PAGE_SHIFT;
+		set_pte_flags(next_pte,flags,KERNEL_PTE);
+	}
 
 	// </lab2>
+	flush_tlb();
 	return 0;
 }
 
@@ -207,8 +273,27 @@ int map_range_in_pgtbl(vaddr_t * pgtbl, vaddr_t va, paddr_t pa,
 int unmap_range_in_pgtbl(vaddr_t * pgtbl, vaddr_t va, size_t len)
 {
 	// <lab2>
-
+	for(vaddr_t end_va = va + len;va < end_va; va += PAGE_SIZE)
+	{
+		ptp_t *cur_ptp = (ptp_t*)pgtbl;
+		ptp_t *next_ptp = NULL;
+		pte_t *next_pte = NULL;
+		int level = 0;
+		int err = 0;
+		while(level <= 2 && (err = get_next_ptp(cur_ptp,level,va,&next_ptp,&next_pte,true)) ==NORMAL_PTP)
+		{
+			cur_ptp = next_ptp;
+			++level;
+		}
+		if(err == NORMAL_PTP &&cur_ptp != NULL && level == 3)
+		{
+			u32 index = GET_L3_INDEX(va);
+			next_pte = &(cur_ptp->ent[index]);
+			next_pte->pte = 0;
+		}
+	}
 	// </lab2>
+	flush_tlb();
 	return 0;
 }
 
