@@ -184,7 +184,7 @@ int query_in_pgtbl(vaddr_t * pgtbl, vaddr_t va, paddr_t * pa, pte_t ** entry)
 			return -ENOMAPPING;
 		}
 
-		if(!next_pte->l3_page.is_valid || !next_pte->l3_page.is_table)
+		if(!next_pte->l3_page.is_valid || !next_pte->l3_page.is_page)
 		{
 			return -ENOMAPPING;
 		}

@@ -187,7 +187,7 @@ static struct page *merge_page(struct phys_mem_pool *pool, struct page *page)
 		return NULL;
 	}
 	struct free_list *fl = &pool->free_lists[page->order];
-	list_del(page->node);
+	list_del(&(page->node));
 	--fl->nr_free;
 	while(page->order < BUDDY_MAX_ORDER -1)
 	{
@@ -204,13 +204,13 @@ static struct page *merge_page(struct phys_mem_pool *pool, struct page *page)
 		}
 		b_p ->allocated = 1; // 没单独拆分出来是不能使用该块的
 		struct free_list *fls = &pool->free_lists[page->order];
-		list_del(page->node);
+		list_del(&(page->node));
 		--fls->nr_free;
 		++page->order;
 	}
-	struct free_list *fl = pool->free_lists[page->order];
-	list_add(&page->node,&fl->free_list);
-	++fl->nr_free;
+	struct free_list *fls2 = &pool->free_lists[page->order];
+	list_add(&page->node,&fls2->free_list);
+	++fls2->nr_free;
 	return page; 
 	// </lab2>
 }
