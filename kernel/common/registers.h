@@ -72,6 +72,8 @@
 
 #ifndef __ASM__
 /* Types of the registers */
+// 所需要的0-30通用寄存器和
+//以及 SP_EL0、 ELR_RL1、 SPSR_EL1、 TPIDR_EL0 这四个特殊的寄存器。
 enum reg_type {
 	X0 = 0,			/* 0x00 */
 	X1 = 1,			/* 0x08 */

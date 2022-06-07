@@ -70,13 +70,13 @@ static void __object_put(struct object *object)
 	if (old_refcount == 1)
 		kfree(object);
 }
-
+// 取出一个就绪线程
 /* object refenrence */
 void *obj_get(struct process *process, int slot_id, int type)
 {
 	return get_opaque(process, slot_id, true, type);
 }
-
+// 向队列中放入一个线程
 void obj_put(void *obj)
 {
 	struct object *object = container_of(obj, struct object, opaque);

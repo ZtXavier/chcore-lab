@@ -97,10 +97,14 @@ struct elf_header_32 {
 struct elf_program_header {
 	u32 p_type;
 	u32 p_flags;
+	// 程序段在文件中相对于文件开头位置的偏移量
 	u64 p_offset;
+	// 程序段在虚拟内存中的起始地址
 	u64 p_vaddr;
 	u64 p_paddr;
+	// 程序段在文件中的长度
 	u64 p_filesz;
+	// 程序段在虚拟内存里的长度
 	u64 p_memsz;
 	u64 p_align;
 };

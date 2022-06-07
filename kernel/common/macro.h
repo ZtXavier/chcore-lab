@@ -13,8 +13,9 @@
 #pragma once
 // 内存对齐的方式
 #define ALIGN(n) __attribute__((__aligned__(n)))
-
+// 向上取整
 #define ROUND_UP(x, n)		(((x) + (n) - 1) & ~((n) - 1))
+// 向下取整
 #define ROUND_DOWN(x, n)	((x) & ~((n) - 1))
 #define DIV_ROUND_UP(n, d)	(((n) + (d) - 1) / (d))
 
@@ -56,6 +57,7 @@
 #define BIT(x)			(1UL << (x))
 
 #define offsetof(TYPE, MEMBER)  ((u64)&((TYPE *)0)->MEMBER)
+// 该类型的大小
 #define container_of(ptr, type, field) \
 	((type *)((void *)(ptr) - (u64)(&(((type *)(0))->field))))
 

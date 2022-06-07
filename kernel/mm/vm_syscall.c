@@ -352,6 +352,52 @@ u64 sys_handle_brk(u64 addr)
 	 * return origin heap addr on failure;
 	 * return new heap addr on success.
 	 */
+	retval = vmspace->user_current_heap;
+	// 若地址为零，需要初始化堆
+	if(addr == 0)
+	{
+		pmo = obj_alloc(TYPE_PMO,sizeof(*pmo));
+		if(!pmo)
+		{
+			retval = -ENOMEM;
+			goto error_return;
+		}
+		pmo_init(pmo,PMO_ANONYM,0,0);
+		int pmo_cap = cap_alloc(current_process,pmo,0);
+		if(pmo_cap < 0)
+		{
+			retval = pmo_cap;
+			goto free_obj;
+		}
+		vmr = init_heap_vmr(vmspace,vmspace->user_current_heap,pmo);
+		if(vmr == NULL)
+		{
+			retval = -ENOMAPPING;
+			goto free_obj;
+		}
+		vmspace->heap_vmr = vmr;
+		retval = vmspace->user_current_heap;
+	}
+	else if(addr > vmspace->user_current_heap + vmspace->heap_vmr->size)
+	{
+		size_t _sz = ROUND_UP(addr - vmspace->user_current_heap,PAGE_SIZE);
+		vmspace->heap_vmr->size = _sz;
+		vmspace->heap_vmr->pmo->size = _sz;
+		retval = addr;
+	}
+	else if(addr < vmspace->user_current_heap + vmspace->heap_vmr->size)
+	{
+		retval = -EINVAL;
+		goto error_return;
+	}
+
+
+
+	obj_put(vmspace);
+	return retval;
+free_obj:
+	obj_free(pmo);
+error_return:
 	obj_put(vmspace);
 	return retval;
 }

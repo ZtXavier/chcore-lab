@@ -49,6 +49,13 @@ char thread_state[][STATE_STR_LEN] = {
  * Switch vmspace and arch-related stuff
  * Return the context pointer which should be set to stack pointer register
  */
+/*
+ 	切换 vmspace 和 arch 相关的东西
+ * 返回应该设置为堆栈指针寄存器的上下文指针 
+ */
+
+// 切换到当前线程的地址空间上，更新了TTBRO_EL1
+// 返回当前的线程的上下文呢    
 u64 switch_context(void)
 {
 	struct thread *target_thread;
@@ -71,13 +78,21 @@ u64 switch_context(void)
 		 * switch_context is always required for running a (new) thread.
 		 * So, we invoke record_running_cpu here.
 		 */
+		/* 
+		* 记录线程运行的 CPU：用于 TLB 维护。
+		* 运行（新）线程始终需要 switch_context。
+		* 所以，我们在这里调用record_running_cpu
+		*/
 		BUG_ON(!target_thread->vmspace);
 		switch_thread_vmspace_to(target_thread);
 	}
 	/*
 	 * Lab3: Your code here
 	 * Return the correct value in order to make eret_to_thread work correctly
+	 * 返回正确的值以使 eret_to_thread 正常工作
 	 * in main.c
 	 */
-	return 0;
+	// 返回当前线程内部的上下文寄存器
+	return (u64)target_ctx->ec.reg;
+	//return 0;
 }

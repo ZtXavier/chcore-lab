@@ -47,9 +47,9 @@ struct slot_table {
 };
 
 struct process {
-	struct slot_table slot_table;
+	struct slot_table slot_table; //保存的是内核状态信息
 
-	struct list_head thread_list;
+	struct list_head thread_list;// 该进程下的线程
 };
 
 #define current_process (current_thread->process)

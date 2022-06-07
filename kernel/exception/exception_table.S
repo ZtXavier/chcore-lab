@@ -117,6 +117,38 @@
  * NOTE: el1t means SP_EL0 is used as stack before exception and el1h
  * means SP_EL1 is used
  */
+
+/*
+* Lab3: 你的代码在这里
+ * 使用 exception_entry 填充异常向量表进行重定向
+ * 每个条目到 cooresponed 条目。
+ * 注意：el1t 表示 SP_EL0 用作异常前的堆栈，el1h
+ * 表示使用 SP_EL1
+*/
+
+.align	11
+EXPORT(el1_vector)
+	exception_entry sync_el1t
+	exception_entry irq_el1t
+	exception_entry fiq_el1t
+	exception_entry error_el1t
+	
+	exception_entry sync_el1h
+	exception_entry irq_el1h
+	exception_entry fiq_el1h
+	exception_entry error_el1h
+	
+	exception_entry sync_el0_64
+	exception_entry irq_el0_64
+	exception_entry fiq_el0_64
+	exception_entry error_el0_64
+	
+	exception_entry sync_el0_32
+	exception_entry irq_el0_32
+	exception_entry fiq_el0_32
+	exception_entry error_el0_32
+
+
 .align	11
 EXPORT(el1_vector)
 

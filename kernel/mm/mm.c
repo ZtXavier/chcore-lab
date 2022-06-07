@@ -79,6 +79,7 @@ void mm_init(void)
 	u64 start_vaddr = 0;
 	
     // 将free_mem_start 指定为img_end
+	//先分配空闲地址，在分配虚拟地址
 	free_mem_start =
 	    phys_to_virt(ROUND_UP((vaddr_t) (&img_end), PAGE_SIZE));
 	npages = NPAGES;
@@ -86,7 +87,7 @@ void mm_init(void)
 	kdebug("[CHCORE] mm: free_mem_start is 0x%lx, free_mem_end is 0x%lx\n",
 	       free_mem_start, phys_to_virt(PHYSICAL_MEM_END));
 	 
-	//预留最大页数作为内存空间
+	//预留最大页数作为内存空间，并对其进行判断
 	if ((free_mem_start + npages * sizeof(struct page)) > start_vaddr) {
 		BUG("kernel panic: init_mm metadata is too large!\n");
 	}

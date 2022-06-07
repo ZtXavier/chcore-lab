@@ -27,11 +27,11 @@ extern struct thread *current_threads[PLAT_CPU_NUM];
 #define ROOT_THREAD_PRIO		MAX_PRIO - 1
 
 struct thread {
-	struct list_head node;	// link threads in a same process
-	struct thread_ctx *thread_ctx;	// thread control block
-	struct vmspace *vmspace;	// memory mapping
+	struct list_head node;	// link threads in a same process 从属于同一个进程的线程链表
+	struct thread_ctx *thread_ctx;	// thread control block 线程的上下文
+	struct vmspace *vmspace;	// memory mapping   该线程所创建的虚拟内存映射信息
 
-	struct process *process;
+	struct process *process; // 线程从属的进程
 };
 
 void switch_thread_vmspace_to(struct thread *);

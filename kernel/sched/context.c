@@ -58,6 +58,26 @@ void init_thread_ctx(struct thread *thread, u64 stack, u64 func, u32 prio,
 	/* Fill the context of the thread */
 
 	/* Set thread type */
+	/*您的代码在这里
+* 这里需要初始化一个线程的上下文，以便后面的eret_to_thread(context)正常工作
+*
+* 在这个函数中，你需要设置线程上下文的寄存器和类型，包括：
+* 1. 将 SP_EL0 设置为堆栈。
+* 2. 将 ELR_EL1 设置为该线程的入口点。
+* 3. 将 SPSR_EL1 设置为 SPSR_EL1_EL0t 作为正确的 PSTATE。其中最...之一
+* 重要字段为SPSR_EL1[3:0]（设置为0表示eret到eret_to_thread中的EL0）
+*
+* 查看 registers.h 中的宏以获得更多帮助
+*/
+
+/* 填充线程的上下文 */
+
+/* 设置线程类型 */
+
+	thread->thread_ctx->ec.reg[SP_EL0] = stack;
+	thread->thread_ctx->ec.reg[ELR_EL1] = func;
+	thread->thread_ctx->ec.reg[SPSR_EL1] = SPSR_EL1_USER;
+	
 	thread->thread_ctx->type = type;
 }
 

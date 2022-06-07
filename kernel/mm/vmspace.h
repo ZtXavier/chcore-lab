@@ -27,7 +27,7 @@ struct vmregion {
 	vmr_prop_t perm;
 	struct pmobject *pmo;
 };
-
+// 虚拟内存
 struct vmspace {
 	/* list of vmregion */
 	struct list_head vmr_list;

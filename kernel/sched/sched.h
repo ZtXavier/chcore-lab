@@ -70,7 +70,7 @@ typedef struct arch_exec_cont {
 
 struct thread_ctx {
 	/* Executing Context */
-	arch_exec_cont_t ec;
+	arch_exec_cont_t ec;      // 上下文中包含的寄存器
 
 	/* Thread Type */
 	u32 type;

@@ -237,7 +237,7 @@ static int ramdisk_read_file(char *path, char **buf)
 	else
 		return -ENOSYS;
 }
-
+// 创建出跟进程
 /* process_create_root: create the root process */
 void process_create_root(char *bin_name)
 {
@@ -246,7 +246,7 @@ void process_create_root(char *bin_name)
 	struct thread *root_thread;
 	char *binary = NULL;
 	int ret;
-
+	// 从磁盘中载入ELF文件
 	ret = ramdisk_read_file(bin_name, &binary);
 	BUG_ON(ret < 0);
 	BUG_ON(binary == NULL);
